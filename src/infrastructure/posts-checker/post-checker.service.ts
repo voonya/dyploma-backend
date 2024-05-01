@@ -12,21 +12,21 @@ import { PostRepository } from '../repository/entities/post';
 export class PostsCheckerService implements OnApplicationBootstrap {
     private _isProcessing = false;
 
-    constructor(public readonly telegramService: TelegramService, private eventEmitter: EventEmitter2, private channelRepository: ChannelRepository) {}
+    constructor(public readonly telegramService: TelegramService, private eventEmitter: EventEmitter2, private channelRepository: ChannelRepository, private postRepository: PostRepository) {}
 
     public async onApplicationBootstrap() {
        //await this.checkChannelsForNewPosts();
        //await this.telegramService.joinChannel('https://t.me/odessa_infonews');
     }
 
-    @Cron("*/5 * * * *")
+    //@Cron("*/1 * * * *")
     private async checkChannelsForNewPosts() {
         if(this._isProcessing) {
             console.log('Checking posts already processing...')
         }
 
         this._isProcessing = true;
-        const channels = (await this.getChannelsForCheck());
+        const channels = (await this.getChannelsForCheck()).slice(0, 1);
 
         const result: Record<string, any> = {};
         let countNewPosts = 0;
@@ -37,12 +37,12 @@ export class PostsCheckerService implements OnApplicationBootstrap {
             let limit;
 
             if(!minId) {
-                limit = 20;
+                limit = 150;
             }
 
-            const posts = (await this.telegramService.getPosts(channel.link, minId, limit)).filter((el: any) => el.msg != '');
+            const posts = (await this.telegramService.getPosts(channel.link, minId, limit)).filter((el: any) => el.msg != '' && !!el.msg).slice(0, 1);
 
-            
+            await this.savePostsForChannel(channel, posts);
             countNewPosts += posts.length;
             result[channel.link] = { channel, posts };
 
@@ -51,7 +51,7 @@ export class PostsCheckerService implements OnApplicationBootstrap {
 
         console.log(`Finish checking posts: ${countNewPosts} new posts`);
 
-        this.eventEmitter.emit('new-posts', result);
+        //this.eventEmitter.emit('new-posts', result);
         this._isProcessing = false;
     }
 
@@ -59,4 +59,15 @@ export class PostsCheckerService implements OnApplicationBootstrap {
     private async getChannelsForCheck() {
         return this.channelRepository.getAll();
     }
+
+    private async savePostsForChannel(channel: Channel, posts: Post[]): Promise<Post[]> {
+        if(posts.length > 0) {
+            channel.lastPostIdInSocial = String(posts[0].idInSocial);
+            await this.channelRepository.update(channel);
+
+            return await this.postRepository.createMany(posts.map(el => ({...el, channel: channel})));
+        }
+
+        return [];
+    } 
 }

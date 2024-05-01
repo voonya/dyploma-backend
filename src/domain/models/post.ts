@@ -6,6 +6,8 @@ export class Post extends BaseModel {
   channel?: Channel;
   msg: string;
   socialCreationDate: Date;
-  isPropagandaPredicted: boolean;
+  isPropagandaPredicted?: boolean;
   isPropaganda: boolean | null;
+  topicWords?: string | null;
+  msgCleared?: string | null;
 }

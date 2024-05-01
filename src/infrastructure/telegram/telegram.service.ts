@@ -43,7 +43,7 @@ export class TelegramService implements OnModuleInit {
       idInSocial: "-" + result.fullChat.id as any,
       title: (result.chats[0] as any).title,
       description: result.fullChat.about,
-      availableReactions: (result.fullChat.availableReactions as any)?.reactions?.map((el: any) => el.emoticon) || [],
+      availableReactions: (result.fullChat.availableReactions as any)?.reactions?.map((el: any) => el.emoticon).filter((el: any) => !!el) || [],
       lastPostIdInSocial: null
     };
     

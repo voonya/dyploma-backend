@@ -4,6 +4,9 @@ import { ChannelRepository } from './channel';
 import { CanOperateRepository } from './can-operate';
 import { PostRepository } from './post';
 import { PostOperationRepository } from './post-operation';
+import { ReactionRepository } from './reaction';
+import { TopicRepository } from './topic';
+import { TopicCreationRepository } from './topic-creations';
 
 
 @Module({
@@ -13,6 +16,9 @@ import { PostOperationRepository } from './post-operation';
     CanOperateRepository,
     PostRepository,
     PostOperationRepository,
+    ReactionRepository,
+    TopicRepository,
+    TopicCreationRepository,
   ],
   exports: [
     PrismaService,
@@ -20,6 +26,9 @@ import { PostOperationRepository } from './post-operation';
     CanOperateRepository,
     PostRepository,
     PostOperationRepository,
+    ReactionRepository,
+    TopicRepository,
+    TopicCreationRepository,
   ],
 })
 export class RepositoriesModule {}

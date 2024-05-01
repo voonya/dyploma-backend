@@ -23,6 +23,25 @@ class PostOperationRepository {
 
     return record;
   }
+
+  async getAllWithPagination(limit: number, offset: number): Promise<[PostOperation[], number]> {
+    const [posts, totalCount] = await Promise.all([
+      this.prisma.postOperation.findMany({
+          take: limit,
+          skip: offset,
+          include: {
+            post: true,
+            account: true,
+          },
+          orderBy: {
+            createdAt: 'desc',
+          },
+      }),
+      this.prisma.postOperation.count(),
+      ]);
+
+      return [posts, totalCount];
+  }
 }
 
 export { PostOperationRepository };

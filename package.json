@@ -23,7 +23,8 @@
     "db:migrate:undo": "npx prisma migrate diff --from-schema-datamodel prisma/schema.prisma --to-schema-datasource prisma/schema.prisma --script > down.sql",
     "db:migrate": "prisma migrate dev",
     "db:seed": "ts-node ./prisma/seeds/seed.ts",
-    "db:seed:delete": "ts-node --files ./prisma/seeds/delete.ts"
+    "db:seed:delete": "ts-node --files ./prisma/seeds/delete.ts",
+    "db:format": "prisma format"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -33,6 +34,9 @@
     "@nestjs/schedule": "^4.0.2",
     "@nestjs/swagger": "^7.3.1",
     "@prisma/client": "^5.12.1",
+    "axios": "^1.6.8",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "telegram": "^2.20.15"

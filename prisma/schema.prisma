@@ -19,6 +19,9 @@ model Account {
   name           String          @unique @db.Text
   phoneNumber    String          @unique @db.Text
   password       String          @db.Text
+  session        String          @db.Text
+  apiId          Int
+  apiHash        String
   canOperates    CanOperate[]
   postOperations PostOperation[]
   createdAt      DateTime        @default(now())
@@ -31,7 +34,7 @@ model Channel {
   link               String       @unique @db.Text
   title              String       @db.Text
   description        String       @db.Text
-  lastPostIdInSocial String?       @db.Text
+  lastPostIdInSocial String?      @db.Text
   availableReactions String[]
   posts              Post[]
   canOperates        CanOperate[]
@@ -52,27 +55,64 @@ model CanOperate {
 }
 
 model Post {
-  id             String          @id @default(uuid()) @db.Uuid
-  idInSocial     String
-  channel        Channel         @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  channelId      String          @db.Uuid
-  msg            String          @db.Text
-  socialCreationDate DateTime
-  isPropagandaPredicted Boolean
-  isPropaganda Boolean? 
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @default(now())
-  postOperations PostOperation[]
+  id                    String          @id @default(uuid()) @db.Uuid
+  idInSocial            String
+  channel               Channel         @relation(fields: [channelId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  channelId             String          @db.Uuid
+  msg                   String          @db.Text
+  msgCleared            String?         @db.Text
+  topicWords            String?         @db.Text
+  socialCreationDate    DateTime
+  isPropagandaPredicted Boolean?
+  isPropaganda          Boolean?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @default(now())
+  postOperations        PostOperation[]
 }
 
 model PostOperation {
   id        String   @id @default(uuid()) @db.Uuid
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   postId    String   @db.Uuid
-  account   Account?  @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  accountId String?   @db.Uuid
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  accountId String?  @db.Uuid
   reaction  String?  @db.Text
   comment   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model TopicCreation {
+  id        String   @id @default(uuid()) @db.Uuid
+  topics    Topic[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Topic {
+  id              String         @id @default(uuid()) @db.Uuid
+  words           String
+  topicDataId     Int
+  topicCreation   TopicCreation  @relation(fields: [topicCreationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicCreationId String         @db.Uuid
+  messages        TopicMessage[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @default(now())
+}
+
+model TopicMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  message   String
+  topic     Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  topicId   String   @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Reaction {
+  id        String   @id @default(uuid()) @db.Uuid
+  reaction  String
+  rank      Int
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }

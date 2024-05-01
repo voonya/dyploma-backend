@@ -2,6 +2,19 @@ import re
 import json
 import sys
 
+
+import spacy
+
+nlp = spacy.load("ru_core_news_lg")
+import ru_core_news_lg
+nlp = ru_core_news_lg.load()
+lemmatizer = nlp.get_pipe("lemmatizer")
+
+def extract_lemmas(text):
+    doc = nlp(text)
+    lemmas = [token.lemma_ for token in doc]
+    return " ".join(lemmas)
+
 def remove_emojis(text):
     # Define regex pattern for emojis
     emoji_pattern = re.compile("["
@@ -27,11 +40,6 @@ def remove_emojis(text):
     # Remove emojis from the text
     return emoji_pattern.sub(r'', text)
 
-def get_pandas_df(filename_path, sep = ','):
-    import pandas as pd
-
-    return pd.read_csv(filename_path, sep=sep, encoding='utf-8')
-
 def remove_link_mails_hashtags_tags(text):
     return ' '.join(re.sub("(\S+@\S+\.\S+)|(@[\_A-Za-z0-9]+)|(\w+:\/\/\S+)|", "", text).split())
 
@@ -45,14 +53,29 @@ def remove_punctuation(text):
     return ' '.join(re.sub("([^\w\s]+)", " ", text).split())
 
 def remove_english_text(text):
-    return ' '.join(re.sub("([A-Za-z]+)", " ", text).split())
+    return ' '.join(re.sub("([A-Za-z]{2,})", " ", text).split())
+
+def remove_cut_words(text):
+    return ' '.join(re.sub("((\s|[\.]{0,})[а-яёА-яЁ]\.)", " ", text).split())
+
+def remove_number_abbr(text):
+    return ' '.join(re.sub("(\d+\-[а-яёА-яЁ]+)", " ", text).split())
 
 def remove_numbers(text):
     return ' '.join(re.sub("([0-9]+)", " ", text).split())
 
+def remove_single_characters(text):
+    return ' '.join(re.sub("(^|\s+)([а-яёА-яЁa-zA-Z](\s+|$))+", " ", text).split())
+
+def to_lower(text):
+    return text.lower()
+
+def remove_template_phrases(text):
+    return ' '.join(re.sub("(подпишись|подписывайтесь|подписывайся|(наш\sчат)|(просим поддержать репостами)|подписаться|архангел спецназа|прислать нам).*", " ", text).split())
+
 def clear_text(text):
     from functools import reduce
-    pipeline = [remove_emojis, remove_link_mails_hashtags_tags, remove_card_numbers, remove_phone_numbers, remove_punctuation, remove_numbers]
+    pipeline = [remove_emojis, remove_link_mails_hashtags_tags, remove_card_numbers, remove_phone_numbers, remove_number_abbr, remove_punctuation, remove_numbers, remove_english_text, to_lower, remove_single_characters, remove_template_phrases, extract_lemmas]
 
     return reduce(lambda text, func: func(text), pipeline, text)
 
@@ -84,20 +107,24 @@ def predict(msgs, classifier, vectorizer):
     return topic_num
 
 def get_topic_words(topic_words, topic_id):
-    return [word.strip() for phrase in topic_words['topic'][topic_id] for word in phrase.split(',')]
+    return topic_words['topic'][topic_id]
 
 def get_topic(texts):
-    cleared_texts = (clear_text(text) for text in texts)
-    #print("*******Text cleared*******")
-    models, vectorizer = load_models('./src/infrastructure/data-analys/python-scripts/models/topics-new')
-    #print("*******Models loaded*******")
-    result = predict(cleared_texts, models['lda'], vectorizer)
+    try:
+        cleared_texts = [clear_text(text) for text in texts]
+        #print("*******Text cleared*******")
+        models, vectorizer = load_models('./src/infrastructure/data-analys/python-scripts/models/topics-new')
+        #print("*******Models loaded*******")
+        result = predict(cleared_texts, models['lda'], vectorizer)
 
-    topics_words = get_pandas_df('./src/infrastructure/data-analys/python-scripts/data/topics_new_data.csv')
-    #print(topics_words['topic'][result])
-    #print("*******Prediction done*******")
-    current_topic_words = [get_topic_words(topics_words, topic_id) for topic_id in result]
-    return json.dumps({'topic_ids': [int(topic_id) for topic_id in result], 'topic_words': current_topic_words})
+        topics_words = get_pandas_df('./src/infrastructure/data-analys/python-scripts/data/topics_new_data.csv')
+        #print(topics_words['topic'][result])
+        #print("*******Prediction done*******")
+        current_topic_words = [get_topic_words(topics_words, topic_id) for topic_id in result]
+        return json.dumps({'topic_ids': [int(topic_id) for topic_id in result], 'topic_words': current_topic_words, 'cleared_texts': cleared_texts})
+    except Exception as err:
+        print(json.dumps({'error': f"Unexpected {err=}, {type(err)=}"}))
+
 
 data = json.loads(sys.argv[1])
 print(get_topic(data))

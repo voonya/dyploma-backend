@@ -8,7 +8,7 @@ class ChannelRepository {
     @Inject(forwardRef(() => PrismaService)) private prisma: PrismaService,
   ) {}
 
-  getAll(): Promise<Channel[]> {
+  async getAll(): Promise<Channel[]> {
     return this.prisma.channel.findMany({
       select: {
         id: true,
@@ -22,6 +22,31 @@ class ChannelRepository {
         updatedAt: true,
       },
     });
+  }
+
+  async getAllWithPagination(limit: number, offset: number): Promise<[Channel[], number]> {
+    const [channels, totalCount] = await Promise.all([
+      this.prisma.channel.findMany({
+          take: limit,
+          skip: offset,
+      }),
+      this.prisma.channel.count(),
+      ]);
+
+      return [channels, totalCount];
+    // return this.prisma.channel.findMany({
+    //   select: {
+    //     id: true,
+    //     idInSocial: true,
+    //     link: true,
+    //     title: true,
+    //     description: true,
+    //     availableReactions: true,
+    //     lastPostIdInSocial: true,
+    //     createdAt: true,
+    //     updatedAt: true,
+    //   },
+    // });
   }
 
   getById(id: string): Promise<Channel | null> {
