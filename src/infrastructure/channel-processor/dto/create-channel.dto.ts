@@ -1,9 +1,6 @@
-import { IsString, IsArray } from "class-validator";
+import { IsString } from 'class-validator';
 
 export class CreateChannelDto {
-    @IsString()
-    link: string;
-
-    @IsArray()
-    accountIds: string[];
+  @IsString()
+  link: string;
 }

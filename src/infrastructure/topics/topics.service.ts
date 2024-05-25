@@ -1,29 +1,27 @@
 import { Injectable } from '@nestjs/common';
 
 import { TopicMessage } from 'src/domain/models';
-import { TopicRepository } from '../repository/entities/topic';
+import { TopicRepository } from '../../dal/entities/topic';
 
 @Injectable()
 export class TopicsService {
-    constructor(
-        private readonly topicsRepository: TopicRepository
-    ) {}
+  constructor(private readonly topicsRepository: TopicRepository) {}
 
-    public updateTopicMessage(message: TopicMessage) {
-        return this.topicsRepository.updateTopicMessage(message);
-    }
+  public updateTopicMessage(message: TopicMessage) {
+    return this.topicsRepository.updateTopicMessage(message);
+  }
 
-    public deleteTopicMessage(messageId: string) {
-        return this.topicsRepository.deleteTopicMessage(messageId);
-    }
+  public deleteTopicMessage(messageId: string) {
+    return this.topicsRepository.deleteTopicMessage(messageId);
+  }
 
-    public addTopicMessage(message: TopicMessage, topicId: string) {
-        return this.topicsRepository.addMessageToTopic(message, topicId);
-    }
+  public addTopicMessage(message: TopicMessage, topicId: string) {
+    return this.topicsRepository.addMessageToTopic(message, topicId);
+  }
 
-    public async getTopics() {
-        const results = await this.topicsRepository.getLastTopics();
+  public async getTopics() {
+    const results = await this.topicsRepository.getLastTopics();
 
-        return { topics: results };
-    }
+    return { topics: results };
+  }
 }

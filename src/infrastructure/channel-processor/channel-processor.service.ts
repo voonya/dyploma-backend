@@ -1,43 +1,42 @@
 import { Injectable } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { DataAnalysService } from '../data-analys/data-analys.service';
-import { ChannelRepository } from '../repository/entities/channel';
-import { Channel } from 'src/domain/models';
-import { TelegramService } from '../telegram/telegram.service';
+
+import { ChannelRepository } from '../../dal/entities/channel';
+import { AccountPoolService } from '../account-pool/account-pool.service';
 
 @Injectable()
 export class ChannelProcessorService {
-    constructor(private readonly channelRepository: ChannelRepository, private readonly telegramService: TelegramService) {}
+  constructor(
+    private readonly channelRepository: ChannelRepository,
+    private readonly accountsPool: AccountPoolService,
+  ) {}
 
-    public async addChannel(link: string, accountIds: string[]) {
-        const channel = await this.channelRepository.getByLink(link);
+  public async addChannel(link: string) {
+    const client = this.accountsPool.getAccounts()[0];
+    const channel = await this.channelRepository.getByLink(link);
 
-        if(channel != null) {
-            throw new Error(`Channel ${link} already added!`);
-        }
-
-        // fetch full channel;
-        const tgChannel = await this.telegramService.getFullChannel(link);
-
-        // create channel
-        const createdChannel = await this.channelRepository.create(tgChannel);
-
-        if(accountIds.length > 0) {
-            await this.attachAcountToChannel(createdChannel.id, accountIds);
-        }
-
-        return createdChannel;
+    if (channel != null) {
+      throw new Error(`Channel ${link} already added!`);
     }
 
-    public async getPaginatedChannels(limit: number, page: number) {
-        const skip = (page - 1) * limit;
+    const tgChannel = await client.getFullChannel(link);
 
-        const results = await this.channelRepository.getAllWithPagination(limit, skip);
+    const createdChannel = await this.channelRepository.create(tgChannel);
 
-        return {channels: results[0], total: results[1]};
-    }
+    return createdChannel;
+  }
 
-    public async attachAcountToChannel(channelId: string, accountIds: string[]) {
-        // TODO: implement
-    }
+  public async getPaginatedChannels(limit: number, page: number) {
+    const skip = (page - 1) * limit;
+
+    const results = await this.channelRepository.getAllWithPagination(
+      limit,
+      skip,
+    );
+
+    return { channels: results[0], total: results[1] };
+  }
+
+  public deleteChannel(id: string) {
+    return this.channelRepository.delete(id);
+  }
 }

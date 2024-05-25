@@ -24,16 +24,20 @@ class ChannelRepository {
     });
   }
 
-  async getAllWithPagination(limit: number, offset: number): Promise<[Channel[], number]> {
+  async getAllWithPagination(
+    limit: number,
+    offset: number,
+  ): Promise<[Channel[], number]> {
     const [channels, totalCount] = await Promise.all([
       this.prisma.channel.findMany({
-          take: limit,
-          skip: offset,
+        take: limit,
+        skip: offset,
+        orderBy: { createdAt: 'desc' },
       }),
       this.prisma.channel.count(),
-      ]);
+    ]);
 
-      return [channels, totalCount];
+    return [channels, totalCount];
     // return this.prisma.channel.findMany({
     //   select: {
     //     id: true,
@@ -115,6 +119,12 @@ class ChannelRepository {
         createdAt: true,
         updatedAt: true,
       },
+    });
+  }
+
+  delete(id: string): Promise<Channel> {
+    return this.prisma.channel.delete({
+      where: { id },
     });
   }
 }

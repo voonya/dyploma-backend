@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
 
-import { RepositoriesModule } from '../repository/entities/repositories.module';
+import { RepositoriesModule } from '../../dal/entities/repositories.module';
 import { ChannelProcessorService } from './channel-processor.service';
 import { ChannelProcessorController } from './channel-processor.controller';
-import { TelegramModule } from '../telegram/telegram.module';
-
+import { AccountPoolModule } from '../account-pool/account-pool.module';
 
 @Module({
-  imports: [RepositoriesModule, TelegramModule],
+  imports: [RepositoriesModule, AccountPoolModule],
 
   providers: [ChannelProcessorService],
   controllers: [ChannelProcessorController],
 
-  exports: [ChannelProcessorService]
+  exports: [ChannelProcessorService],
 })
 export class ChannelProcessorModule {}

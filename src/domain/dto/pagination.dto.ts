@@ -7,12 +7,12 @@ export class PaginationDto {
   @Min(1)
   @Max(100)
   @IsOptional()
-  @Transform(({value}) => Number(value))
+  @Transform(({ value }) => Number(value))
   limit?: number = 10;
 
   @IsInt()
   @Min(1)
   @IsOptional()
-  @Transform(({value}) => Number(value))
+  @Transform(({ value }) => Number(value))
   page?: number = 1;
 }

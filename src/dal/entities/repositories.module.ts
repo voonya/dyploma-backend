@@ -7,7 +7,8 @@ import { PostOperationRepository } from './post-operation';
 import { ReactionRepository } from './reaction';
 import { TopicRepository } from './topic';
 import { TopicCreationRepository } from './topic-creations';
-
+import { AccountRepository } from './account';
+import { UserRepository } from './user';
 
 @Module({
   providers: [
@@ -19,6 +20,8 @@ import { TopicCreationRepository } from './topic-creations';
     ReactionRepository,
     TopicRepository,
     TopicCreationRepository,
+    AccountRepository,
+    UserRepository,
   ],
   exports: [
     PrismaService,
@@ -29,6 +32,8 @@ import { TopicCreationRepository } from './topic-creations';
     ReactionRepository,
     TopicRepository,
     TopicCreationRepository,
+    AccountRepository,
+    UserRepository,
   ],
 })
 export class RepositoriesModule {}

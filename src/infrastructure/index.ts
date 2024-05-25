@@ -1,6 +1,3 @@
-export * from './telegram/telegram.module';
-export * from './telegram/telegram.service';
-
 export * from './data-analys/data-analys.module';
 export * from './data-analys/data-analys.service';
 

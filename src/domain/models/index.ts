@@ -7,4 +7,3 @@ export * from './topic';
 export * from './topic-message';
 export * from './reaction';
 export * from './topic-creation';
-

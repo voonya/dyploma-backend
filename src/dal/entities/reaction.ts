@@ -10,24 +10,27 @@ export class ReactionRepository {
   async getAll(): Promise<Reaction[]> {
     return this.prisma.reaction.findMany({
       orderBy: {
-        rank: 'desc'
-      }
+        rank: 'desc',
+      },
     });
   }
 
-  async getAllWithPagination(limit: number, offset: number): Promise<[Reaction[], number]> {
+  async getAllWithPagination(
+    limit: number,
+    offset: number,
+  ): Promise<[Reaction[], number]> {
     const [channels, totalCount] = await Promise.all([
       this.prisma.reaction.findMany({
-          take: limit,
-          skip: offset,
-          orderBy: {
-            rank: 'desc'
-          }
+        take: limit,
+        skip: offset,
+        orderBy: {
+          rank: 'desc',
+        },
       }),
       this.prisma.reaction.count(),
-      ]);
+    ]);
 
-      return [channels, totalCount];
+    return [channels, totalCount];
   }
 
   create(data: Reaction): Promise<Reaction> {
@@ -40,6 +43,12 @@ export class ReactionRepository {
     return this.prisma.reaction.update({
       where: { id: data.id },
       data,
+    });
+  }
+
+  delete(id: string): Promise<Reaction> {
+    return this.prisma.reaction.delete({
+      where: { id },
     });
   }
 }

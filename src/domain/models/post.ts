@@ -1,5 +1,6 @@
 import { BaseModel } from './base';
 import { Channel } from './channel';
+import { Topic } from './topic';
 
 export class Post extends BaseModel {
   idInSocial: string;
@@ -8,6 +9,6 @@ export class Post extends BaseModel {
   socialCreationDate: Date;
   isPropagandaPredicted?: boolean;
   isPropaganda: boolean | null;
-  topicWords?: string | null;
+  topic?: Topic;
   msgCleared?: string | null;
 }

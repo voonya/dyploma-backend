@@ -5,6 +5,6 @@ import { DataAnalysService } from './data-analys.service';
 @Module({
   imports: [],
   providers: [DataAnalysService],
-  exports: [DataAnalysService]
+  exports: [DataAnalysService],
 })
 export class DataAnalysModule {}

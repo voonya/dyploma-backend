@@ -1,9 +1,11 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateReactionDto {
-    @IsString()
-    reaction: string;
+  @IsString()
+  reaction: string;
 
-    @IsNumber()
-    rank: number;
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  rank: number;
 }

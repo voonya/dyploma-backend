@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 
-import { RepositoriesModule } from '../repository/entities/repositories.module';
+import { RepositoriesModule } from '../../dal/entities/repositories.module';
 import { ReactionsService } from './reactions.service';
 import { ReactionsController } from './reactions.controller';
-
 
 @Module({
   imports: [RepositoriesModule],
@@ -11,6 +10,6 @@ import { ReactionsController } from './reactions.controller';
   providers: [ReactionsService],
   controllers: [ReactionsController],
 
-  exports: [ReactionsService]
+  exports: [ReactionsService],
 })
 export class ReactionsModule {}

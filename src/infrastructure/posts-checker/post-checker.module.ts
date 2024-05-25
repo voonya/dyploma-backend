@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 
-import { TelegramModule } from '../telegram/telegram.module';
 import { PostsCheckerService } from './post-checker.service';
-import { RepositoriesModule } from '../repository/entities/repositories.module';
+import { RepositoriesModule } from '../../dal/entities/repositories.module';
+import { AccountPoolModule } from '../account-pool/account-pool.module';
 
 @Module({
-  imports: [TelegramModule, RepositoriesModule],
+  imports: [RepositoriesModule, AccountPoolModule],
   providers: [PostsCheckerService],
-  exports: [PostsCheckerService]
+  exports: [PostsCheckerService],
 })
 export class PostsCheckerModule {}
